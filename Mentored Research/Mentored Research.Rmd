@@ -1,0 +1,190 @@
+---
+title: "The Effect of Airbnb on Long-Term Housing Availability and Prices"
+short: "The effect of Airbnb on the housing market"
+journal: "Department of Economics"
+month: "`r format(Sys.Date(), '%m')`"
+year: "`r format(Sys.Date(), '%Y')`"
+keywords:
+  - Airbnb
+  - Housing Affordability
+  
+output:
+  rticles::aea_article:
+
+header-includes:
+  - \usepackage{pdfpages}
+  - \usepackage{graphicx}
+  - \usepackage{caption}
+  - \usepackage{booktabs} 
+  - \usepackage{threeparttable} % for table notes
+  - \usepackage{caption}
+author:
+  - name: Luca Gisler
+    affiliation: University of Science and Arts of Oklahoma
+abstract: |
+  This paper empirically estimates how Airbnb activity is associated with changes in housing affordability and availability. 
+  It provides a rough estimate of the average increase in long-term rental apartment prices by the number of Airbnb listings in an area. A 1% increase in Airbnb listings in an area in 2025 is associated with a X% increase in long-term rental prices at both 10% and 5% levels of significance.
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(dev = 'pdf')
+
+```
+
+According to Jarvis (2024), the Dallas–Fort Worth metropolitan area is among the fastest-growing regions in the United States. 
+This rapid growth places upward pressure on housing demand and prices. Dallas–Fort Worth has also experienced one of the highest growth rates of Airbnb listings in the United States (CultureMap Dallas).The spatial mismatch hypothesis highlights the close relationship between housing and labor markets. Employment opportunities are often concentrated near city centers, while affordable housing is increasingly located farther away. This separation leads to longer commute times and reduced job accessibility for low-income households (Ihlanfeldt).As tourism in the Dallas–Fort Worth area has increased (Graber), short-term rental platforms such as Airbnb have expanded rapidly. While these platforms may increase income opportunities for property owners, they can also incentivize the conversion of long-term rental units into short-term accommodations. This study examines whether such conversions reduce long-term housing availability and contribute to rising housing costs in Dallas.
+
+## Background and Motivation
+Housing is a fundamental necessity, yet many households are unable to afford homeownership and must rely on rental markets. 
+This research adds to prior work on homelessness, where housing affordability is a key factor preventing homelessness. 
+In urban areas with constrained housing supply, competition for rental units can drive inequality by increasing commuting distances and limiting access to employment opportunities.
+
+## Research Question and Limitations
+This research examines whether increased participation in short-term rental platforms contributes to declining housing affordability in Dallas. 
+Google Trends data and Airbnb listings are used as proxies for short-term rental demand. 
+Key limitations include potential measurement error, seasonal variation in tourism, and proprietary Airbnb data.
+
+## Economic Significance and Application
+Understanding how short-term rentals affect housing supply is crucial for policymakers. 
+If platforms such as Airbnb reduce the availability of long-term housing, targeted regulations or zoning policies may be required to preserve affordability and mitigate spatial inequality.
+
+# Literature Review
+
+## Two-sided Market and Market Efficiency
+
+According to (Rysman, 2009) a market is Two-sided if there are two agents interacting through an intermediary or a platform, while each decision made by an Agent directly influences the outcome of the opposite agent. While some One-sided markets also have an intermediary or a platform the main distinction often is that the decision made by each agent don't influence the outcome of the other agent. A good example for a One-sided market with a platform is Netflix, where the platform connects the viewers with Movies/Shows but the decisions made by one viewer doesn't directly influence another agent. 
+
+Airbnb is a very good example for a Two-sided Market as the platform connects hosts, who list their place for short-term rent, with Guests that are looking to find a home for short-term rental. The agents in the case of Airbnb are the Hosts and Guests. The distinction between a one-sided market is that both agents directly influence the outcome for eachother. For Example if there are more hosts offering places, it may result in potential lower prices for prices for guests as there are more options. 
+On the other side more guests will result in higher occupancy and therefore higher revenue for the hosts, this principle is often referred to as cross-side network effects. According to (Holmgren, 2023) platforms like AirBnb have to come up with strategies to find the equilibrium of Hosts and Guests in order to maximize the platform efficiency. Too Many listings might not meet enough demand and if there are too many travelers there is a high chance that Airbnb listings are already sold out. Therefore the way the two agents interact with each other can have both positive and negative cross-side network effects. 
+
+
+## Market Efficency
+
+As explained in the previous subsection platforms like Airbnb often choose strategies that help the Ecosystem to restore the Equilibrium. In order to understand Airbnb it is important to see the benefits each agent has over traditional short-term rental models like Hotels. The main advantage for hosts is that they can rent out houses that are seasonally vacant or rooms in their house that are unused to guests through a simple platform. Landlord also benefit from plattforms like Airbnb as studies like (Hill et al., 2023) have found that the average Landlord receives almost twice the long-term rental rate when using short-term rental platforms. On the other side guests benefit from a larger selection of price classes and locations compared to traditional hotels. Guest also have the unique opportunity to find good deals through dynamic pricing during off-seasons. These examples illustrate the efficiency gains from short-term rentals on both the supply and demand side.
+
+
+
+
+
+
+## Short-term and long-term Rental Markets 
+
+\begin{figure}[h] % h = "here" in text
+    \centering
+    \includegraphics[width=0.9\textwidth]{/Users/luca/Desktop/Housingvacancy_dallas_map.pdf}
+    \caption{Housing Vacancy Map — Dallas, TX.}
+    \label{fig:dallasmap1}
+\end{figure}
+
+
+
+\begin{figure}[h] % h = "here" in text
+    \centering
+    \includegraphics[width=0.9\textwidth]{/Users/luca/Desktop/Screenshot 2026-01-19 at 7.57.57 PM.png}
+    \caption{Spatial Distribution of Airbnb Listings in Dallas County}
+    \label{fig:dallasmap2}
+\end{figure}
+
+## Empirical Evidence on Airbnb's Effect on Housing Supply and Rents
+
+## Gaps in Existing Literature
+
+
+
+# Theoretical Framework
+
+## Conceptualizing Airbnb as Two-Sided Platform
+
+## Market Equilibrium Between Short-term and Long-term Rentals
+
+As more hosts join the platform, housing units are increasingly reallocated to the short-term market, leading to a growing number of guests that can benefit from a greater variety of accommodation options.
+
+## Expected Effects on Housing Supply and Prices
+
+
+# Data and Methodology
+
+
+## Dependant Variable
+This research paper’s dependent variable is the demand for short-term rentals in Dallas, mea- sured by Google Trends and the number of active Airbnb listings in the city. Since the primary focus of this study is to explore the additional factors contributing to the housing affordabil- ity crisis, the rent-to-income ratio was used as a key measure of housing affordability in the analysis. For more reliable statistics, the data also included the U.S. Census Bureau’s Ameri- can Community Survey (ACS) one-year estimates, as well as Federal Reserve Economic Data (FRED), to measure additional key economic indicators such as median rent, household in-
+The Impact of Airbnb on Housing Supply and Prices 5
+ come, and population estimates. This approach enabled more comprehensive, statistically rel- evant measurement of short-term rental demand in Dallas and of housing affordability.
+ 
+#Dependant Variable is renter and renter units 
+ 
+## Independant Variable
+The primary objective of this study is to examine the relationship between the usage of plat- forms such as Airbnb and Housing Affordability. Due to the difficulty of directly measuring short-term rental demand, this analysis uses Google Trends data points and Airbnb Listings as proxies for it.
+
+#Airbnb Density
+
+
+## Variables and Summary Statistics
+
+## Econometric Model specification
+## Limitations
+
+
+
+# Discussion
+
+## Regression Results and Discussion
+
+The first table is looking at the effects of Airbnb density on the cost of rent in short-rental apartments across from Dallas. The number of observations in this case represent the amount of census tracts that were used for the regression-line given that their population wasn't zero, they didn't have zero renter units and their reported median rent was valid. Other variables such as income, renter share and population were held constant in accordance to the principle of ceteris paribus. The initial results from that regression analysis suggest that there is a negative correlation between Airbnb Density and long-term housing rentals. The Analysis plot with the Regression Analysis line drawn showed that the patterns changed in renter-heavy neighboorhoods. Therefore the second model is looking at whether the Airbnb effects are dependent on the amount of renter in the census tract.Because this paper is looking at a potential housing supply shocked caused by Airbnb, the third model switches from using the dependant variable of average rent to available housing rental units. This model investigates whether Airbnb density is associated with changes in the supply of rental-appartments. In question 4 we are asking again if the housing supply changes in areas, where there are many people renting appartments.
+\begingroup
+\centering
+\begin{tabular}{lcccc}
+   \tabularnewline \midrule \midrule
+   Dependent Variables: & \multicolumn{2}{c}{log\_median\_rent} & \multicolumn{2}{c}{ln\_renter\_units}\\
+    & \multicolumn{2}{c}{Rent (log median rent)} & \multicolumn{2}{c}{Supply (log renter units)} \\ 
+   Model:                     & (1)             & (2)             & (3)             & (4)\\  
+   \midrule
+   \emph{Variables}\\
+   Constant                   & 2.520$^{***}$   & 2.755$^{***}$   & 12.52$^{***}$   & -1.435$^{**}$\\   
+                              & (0.3867)        & (0.3791)        & (1.093)         & (0.5668)\\   
+   Log Airbnb Density         & -0.0207$^{***}$ & -0.0454$^{***}$ & 0.2302$^{***}$  & 0.1155$^{***}$\\   
+                              & (0.0075)        & (0.0091)        & (0.0309)        & (0.0167)\\   
+   Log Median Income          & 0.4352$^{***}$  & 0.4268$^{***}$  & -0.8691$^{***}$ & 0.0185\\   
+                              & (0.0245)        & (0.0243)        & (0.0713)        & (0.0382)\\   
+   Renter Share (centered)    & 0.0160          & -0.1021$^{***}$ &                 & 2.885$^{***}$\\   
+                              & (0.0309)        & (0.0338)        &                 & (0.0646)\\   
+   Log Population             & -0.0118         & -0.0283         & 0.4094$^{***}$  & 0.9101$^{***}$\\   
+                              & (0.0219)        & (0.0216)        & (0.0860)        & (0.0400)\\   
+   airbnb / Renter            & 0.1837$^{***}$  &                 &   \\   
+                              &                 & (0.0297)        &                 &   \\   
+   Airbnb / Renter Share      &                 &                 &                 & -0.1344$^{**}$\\   
+                              &                 &                 &                 & (0.0574)\\   
+   \midrule
+   \emph{Fit statistics}\\
+   Observations               & 617             & 617             & 617             & 617\\  
+   R$^2$                      & 0.53016         & 0.55853         & 0.29626         & 0.87406\\  
+   Adjusted R$^2$             & 0.52709         & 0.55492         & 0.29281         & 0.87302\\  
+   \midrule \midrule
+   \multicolumn{5}{l}{\emph{Clustered (GEOID) standard-errors in parentheses}}\\
+   \multicolumn{5}{l}{\emph{Signif. Codes: ***: 0.01, **: 0.05, *: 0.1}}\\
+\end{tabular}
+\par\endgroup
+
+
+
+
+
+
+
+
+
+
+
+## Robustness Checks
+
+## Discussion of Findings
+
+# Conclusion and Recommendations
+
+## Summary of Key Findings 
+
+## Limitations and Future Research
+
+

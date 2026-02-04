@@ -1,0 +1,189 @@
+---
+title: Section 1.6-8
+author: YOUR NAME HERE
+date: '`r Sys.Date()`' # You do not need to mess with this line
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+
+Do Exercises 1.9.4 and 1.9.8-12
+
+
+
+# 1.9.4
+
+Tips:
+
+- Use the same sample sizes as the example in the book, and to model $t_3$ distribution, use 'dt( 10*100, 3)'.
+- the mean of the t-distribution is 0
+- the variance of the t-distribution with $v$ degrees of freedom is $\frac{v}{v-1}$ (https://en.wikipedia.org/wiki/Student%27s_t-distribution)
+
+```{r}
+# Random 100 samples of 10 points from t_3 distribution
+X = matrix( rt( 10*100, 3), ncol = 10 )
+```
+
+
+```{r}
+X = matrix( rt( 10*100, 3), ncol = 10 )
+
+xbar <-apply(X,1,mean)
+xmed <-apply(X,1,median)
+var(xbar)
+var(xbar)/var(xmed)
+
+#The mean is way more efficient here than the variance. That makes sense because the mean uses every data point for calculation, while the median is only looking at the middle point. I feel like in a data set with n> 100 the higher points can make a huge difference. 
+
+mymeantest <- function(X) t.test(X)$p.value
+mymediantest <- function(X) t.test(X)$p.value
+
+pval <- apply(X,1,mymeantest)
+pval <- apply(X, 1,mymediantest)
+mymeantest(pval<0.05)
+mymediantest(pval <0.05)
+
+#I feel like this is very good because we are only rejecting the null hypothesis at an alpha level of 0.05 by 0.044%.
+
+
+
+```
+
+
+
+
+# 1.9.8
+
+Below is the data that Carrie has recorded from the backside of 59 baseball cards she had.
+
+To run this, make sure you intall Rfit first.
+
+A sunflower plot can be useful for visualizing the relationship between two numeric variables which are either discrete or have been rounded. Use the R function sunflowerplot to obtain a sunflower plot of the relationship between height and weight for the baseball data in Rfit.
+
+
+```{r}
+
+library(Rfit)
+head(baseball)
+```
+
+```{r}
+help(sunflowerplot)
+```
+
+
+```{r}
+
+library(Rfit)
+sunflowerplot(baseball, rotate = TRUE)
+
+
+```
+Tip: Try plotting with the rotate=T argument. I think this makes it clearer to see what is going on.
+
+
+# 1.9.9
+
+A diagnostic test of clairvoyance is to declare a person clairvoyant if they get 8 or more tosses of a fair coin correct out of 10. Determine, either via simulation or directly, the specificity of the test. That is, in this case, determine the probability that a person who is guessing is correctly classified as non-clairvoyant.
+
+
+```{r}
+n <- 10
+p <- 0.5
+q <- 7
+
+probability <- pbinom(q,n,p)
+probability 
+
+random_chance <- (1 - probability) * 100
+random_chance
+
+```
+
+The Probability that someone is falsely clarified as clairvoyance is 5.46875% as the probability for someone to Get 8 or more tosses of a fair coin correct is 5.46875%. 
+
+
+# 1.9.10
+Simulate the sampling distribution of the mean of 10 tosses of a fair die.
+
+```{r}
+help(sample)
+
+n <- 10000
+size <- 10
+coin <- c(1:6)
+
+set.seed(0)
+CoinTosses <- replicate(n, sample(coin,size, replace = TRUE, prob = c(1/6,1/6,1/6,1/6,1/6,1/6)))
+                        
+Means <- apply(CoinTosses,2, mean)
+
+hist(Means)
+
+```
+
+
+# 1.9.11
+
+```{r}
+help(t.test)
+```
+
+Approximate the power of a t-test 
+
+H0:  population mean = 0
+H1:  population mean > 0
+
+true population mean = 0.5, random sample size n = 25, Standard Deviation = 1, alpha = 0.05 
+
+
+```{r}
+n = 25 
+mu = 0.5
+sigma = 1 
+
+X = matrix( rnorm( n * 1000, mu, sigma), ncol = n )
+
+myttest = function (data) {
+  t.test(data, alternative = "greater")$p.value
+}
+pval <-apply(X,1,myttest)
+mean(pval<0.05)
+
+
+
+```
+
+# 1.9.12
+
+
+```{r}
+help("line")
+help(dnorm)
+help(seq)
+help(points) # Look up argument 'pch' or plotting character
+```
+
+
+```{r}
+
+curve(dnorm(x, 50, 10), from=0, to=100)
+```
+
+
+I struggled with this exercise therefore I searched for shortcuts in the internet and found an easier way proposed by Didier Ruedin. Later I discovered where I went wrong an found the proper way to solve this down here: 
+
+```{r}
+X <- seq(0, 100, length.out = 100)
+pdf <- dnorm(X, mean = 50, sd = 10)
+
+plot(pdf, pch = 0)
+
+
+```
+
+
+
+

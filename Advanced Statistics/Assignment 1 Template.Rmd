@@ -1,0 +1,164 @@
+---
+title: Section 1.1
+author: Luca Gisler
+date: '`r Sys.Date()`' # You do not need to mess with this line
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+
+Do Exercises 1.9.1-3 and 5-7
+
+
+# 1.9.1
+
+1. Even numbers less than 20
+
+```{r}
+seq(0,18, by = 2)
+```
+
+2. Odd numbers between 101 and 203
+
+```{r}
+
+seq(102, 202, by = 2)
+
+```
+
+3. 1 3 1 3 1 3 1 3
+
+```{r}
+x <- (c(1/3,1) * 3)
+
+rep(x, 4)
+
+
+```
+4. 1 1 1 1 3 3 3 3
+
+```{r}
+
+c(rep(1,4), rep(3,4))
+
+
+```
+
+
+
+# 1.9.2
+
+Mean and variance of:
+
+1. First 100 integers
+
+```{r}
+x <- seq(0,100, by = 1)
+mean(x)
+var(x)
+
+```
+
+
+2. x~N(30,5)
+
+#Normal Distribution, Mean = 30, Sd = 5
+
+```{r}
+x = rnorm(50,30,5)
+
+mean(x)
+median(x)
+sd(x)
+length(x)
+var(x)
+```
+
+
+# 1.9.3
+
+```{r}
+set.seed(0)
+sample(c("H","T"),10, replace = T)
+```
+
+# 1.9.4
+
+Tips: 
+
+- Use the same sample sizes as the example in the book, and to model $t_3$ distribution, use 'dt( 10*100, 3)'.
+- mean of the t-distribution is always 0
+- variance of $t_3$ is 3 (https://en.wikipedia.org/wiki/Student%27s_t-distribution)
+
+```{r}
+X = matrix( rt( 10*100, 3), ncol = 10 )
+
+```
+
+```{r}
+X = matrix( rt( 10*100, 3), ncol = 10 )
+
+xbar <-apply(X,1,mean)
+xmed <-apply(X,1,median)
+var(xbar)
+var(xbar)/var(xmed)
+
+#The mean is way more efficient here than the variance. That makes sense because the mean uses every data point for calculation, while the median is only looking at the middle point. I feel like in a data set with n> 100 the higher points can make a huge difference. 
+
+mymeantest <- function(X) t.test(X)$p.value
+mymediantest <- function(X) t.test(X)$p.value
+
+pval <- apply(X,1,mymeantest)
+pval <- apply(X, 1,mymediantest)
+mymeantest(pval<0.05)
+mymediantest(pval <0.05)
+
+#I feel like this is very good because we are only rejecting the null hypothesis at an alpha level of 0.05 by 0.044%.
+
+
+
+
+
+```
+
+# 1.9.5
+
+```{r}
+x <- seq(0, 20, by = 1)
+
+D <- data.frame(x)
+
+summary(D[1:nrow(D), 'x'])
+summary(D[, 'x'])
+summary(D[!is.na(D$x), 1])
+summary(D[rep(TRUE, nrow(D)), 1])
+```
+
+
+
+
+# 1.9.6
+
+```{r}
+rep( c(37,39,40,41,42), times = c(2,2,4,1,2))
+
+
+
+```
+The Code Basically produces twice 37 then twice 39 then 4 times 40 and then once 41 and then twice 42.
+
+# 1.9.7
+
+```{r}
+help(stripchart)
+```
+
+
+```{r}
+x <- rep( c(37,39,40,41,42), times = c(2,2,4,1,2))
+stripchart(x, method = "stack")
+
+```
+
