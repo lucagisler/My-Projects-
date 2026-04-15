@@ -1,0 +1,272 @@
+---
+title: "Assignment 4"
+author: "Luca Gisler"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+
+# 2.8.3 
+## Redo Example 2.4.1 without a for loop and using the apply function
+
+Example 2.4.1 
+
+```{r}
+set.seed(0)
+x <- rnorm(25,30,5)
+B <- 1000 # number of bootstrap samples to optain
+xbar <- rep(0,B)
+
+for(i in 1:B) {
+  xbs <-sample(x,length(x), replace = TRUE)
+  xbar[i] <- mean(xbs)
+}
+  
+se.xbar <- sd(xbar)
+se.xbar
+
+tcv <- qt(0.975, length(x)-1)
+mean(x) + c(-1,1) *tcv*se.xbar
+
+```
+
+The percentile Confidence Interval for the Example 2.4.1 was [28.27832, 32.12086] and the Standard Error of the estimate was [0.9308935]. 
+
+
+```{r}
+set.seed(0)
+
+y = rnorm(25,30,5)
+B <- 1000
+
+bootsamples <- replicate(B, sample(y,length(y), replace = TRUE))
+
+ybar <- apply(bootsamples, 2, mean)
+
+se.ybar <- sd(ybar)
+se.ybar
+
+tcv <- qt(0.975, length(y) - 1)
+mean(y) + c(-1, 1) * tcv * se.ybar
+
+```
+
+
+
+# 2.8.4 
+## Redo Example 2.3.2 without a for loop and using the apply function
+
+Example 2.3.2
+
+```{r}
+n = 30
+df = 2
+nsims = 10000
+mu = 0.5
+
+collwill = rep(0,nsims)
+collt = rep(0,nsims)
+for(i in 1:nsims){
+  x = rt(n,df) + mu
+  will = wilcox.test(x)
+  collwill[i] = will$p.value
+  ttest = t.test(x)
+  collt[i] = ttest$p.value
+}
+
+powwil = rep(0,nsims)
+powwil[collwill <= 0.5] = 1
+powerwil = sum(powwil) / nsims
+powt = rep(0,nsims) ; powt[collt <= 0.5] = 1
+powert = sum(powt) / nsims
+
+
+```
+
+```{r}
+n = 30
+df = 2
+nsims = 10000
+mu = 0.5
+
+collwill <- replicate(nsims, wilcox.test(rt(n, df) + mu)$p.value)
+collt    <- replicate(nsims, t.test(rt(n, df) + mu)$p.value)
+
+powerwil = mean(collwill <= 0.05)
+powert   = mean(collt <= 0.05)
+
+library(knitr)
+resultstable <- data.frame(
+  Test = c("Wilcoxon","t-test"),
+  Theta = 0.5,
+  Power = c(powerwil,powert)
+)
+
+kable(resultstable)
+
+```
+
+
+
+# 2.8.5 
+## Suppose in a poll of 500 registered voters, 269 responded that they would vote for candidate P. Obtain a 90% percentile bootstrap confidence interval for the true proportion of registered voters who plan to vote for P.
+
+
+```{r}
+n = 500
+P = 269
+B = 1000
+
+x <- c(rep(1, P), rep(0, n - P))
+
+xbar = rep(0,B)
+
+for (i in 1:B) {
+  xbs = sample(x, length(x), replace=T)
+  xbar[i] = mean(xbs)
+}
+100 * quantile(xbar, c(0.05, 0.95))
+
+```
+
+The 90% Confidence interval suggest that the true proportion of voters voting for Candidate P is [50.4, 57.6].
+
+
+
+# 2.8.7 
+## Write and R function which computes the sign analysis. For example the following commands compute the Statistics S+, asssuming that the sample is in the vector of x. 
+
+```{r}
+signanalysis <- function(x) {
+    xt <- x[x!=0]
+    nt <- length(xt)
+    
+    ind <- rep(0,nt)
+    ind[xt > 0] <-1
+    
+    splus <- sum(ind)
+    
+    print(c(splus = splus, n = nt))
+    
+}
+
+
+
+```
+
+# 2.8.8 
+## Calculate the sign test for the nursery school example, Example 2.3.1. Show that the p-value for the one-sided sign test is 0.1445.
+
+```{r}
+
+
+library(BSDA)
+school = c(82,69,73,43,58,56,76,65)
+home = c(63,42,74,37,51,43,80,62)
+d = school - home
+B <- 1000
+
+
+SIGN.test(school, 
+          home,
+          md = 0,
+          alternative = "greater",
+          conf.level = 0.95) 
+
+
+
+n <- length(d)
+x <- sum(d > 0)
+
+sum(dbinom(6:8,8,0.5))
+
+
+```
+
+
+
+# 2.8.9 
+## The Data for the nursery school study were drawn from page 79 of Siegel (1956). In the data table, there is an obvious typographical error. In the 8th set of twins, the score for the twin that stayed at home is typed as 82 when it should be 62. Rerun the signed-rank Wilxocon t-analyses using the typographical error value of 82. 
+
+```{r}
+school <- c(82,69,73,43,58,56,76,65)
+home <- c(63,42,74,37,51,43,80,82)
+response <- school - home 
+
+wilcox.test(response, alternative = "two.sided", conf.int = T,
+            conf.level = 0.95)
+
+```
+The 95 % Confidence interval is [-5.5, 19.0]. 
+
+# 2.8.10
+
+```{r}
+
+
+
+rCN = function( n, c, e) {
+  Ie = rbinom(n, size = 1 , prob = e)
+  z = rnorm(n)
+  (1-Ie)*z + c*Ie*z
+}
+
+c = 2 
+e = 0.2
+n = 100
+
+
+rCN(100,c,e)
+
+
+
+
+```
+```{r}
+set.seed(0) 
+N = rnorm(100)
+CN = rCN(100,16,0.25)
+
+par(mfrow = c(1,2))
+hist(N, breaks = 20)
+hist(CN, breaks = 30)
+par(mfrow = c(1,1))
+
+
+boxplot ( cbind(N,CN), names = c("Normal", "Contaminated Normal"))
+
+```
+
+
+
+# 2.8.11 
+## Perform the simulation study of Example 2.3.2 when the population has CN(16,0.25) distribution. For the alternatives, select values of Theta so the spread in empirical powers of the signed-rank Wilcoxon test ranges approximately from 0.05 to 0.90. 
+
+```{r}
+n = 30
+nsims = 10000
+mu = 0.5
+set.seed(0)
+
+X <- matrix( rCN( 30 * nsims,c = 16, e = 0.25) + mu, ncol = n)
+
+
+mywil = function(x) wilcox.test(x)$p.value
+myt = function(x) t.test(x)$p.value
+
+p.wil = apply(X,1,mywil)
+p.t = apply(X,1,myt)
+
+mean(p.wil < 0.05)
+mean(p.t < 0.05)
+
+
+
+```
+
+
+
+

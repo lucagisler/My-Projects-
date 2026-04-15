@@ -1,0 +1,365 @@
+---
+title: "Assignment 5A"
+author: "Luca Gisler"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# 2.8.13
+## Suppose the cure rate for the standard treatment of a disease is 0.60. A new Drug has been developed for the disease and it is thought that the cure rate for patients using it wil exceed 0.60. In a small clinical trial 48 patients having the disease were treated with the new drug and 34 were cured.
+
+
+```{r}
+p = 0.60
+n = 48
+proport = 34/48
+
+```
+### a) Let p be the probability that a patient having the disease is cured by the new drug. Write the hypotheses of interest in terms of p. 
+
+The Null Hypothesis is that p = 0.60. The alternative hypothesis is that p > 0.60-. 
+
+### b) Determine the p-value for the clinical study. What is the decision for a normal level of 0.05
+```{r}
+
+X <- 1 - sum(pbinom(33,48, p = 0.6))
+X
+```
+The P-value for finding the exact given proportion of 34/48 with p = 0.60 is 0.08125713 since that is > 0.05 we reject the null hypothis. 
+
+
+# 2.8.14
+
+## Let p be the probability of success. Suppose it is of hinterest to test H0: p = 0.30 versus HA: p < 0.30. Let S be the number of successes out of 75 Trials. Suppose we reject H0, if S <= 16.
+
+```{r}
+p = 0.30
+n = 75 
+S = 16
+```
+
+
+### a) Determine the significance level of the test
+```{r}
+
+100 * pbinom(S,n,p)
+
+```
+
+The significance level of the test is 6.199817%.
+
+
+### b) Determine the power of the test if true p is 0.25
+
+```{r}
+
+100 * pbinom(S,n, p = 0.25)
+
+```
+The Power of the test is 27.92418% indicating that in approximately 28 out of 100 times the test correctly rejects the null hypothesis. 
+
+### c) Determine the power function for the test for the sequence for the probabilities of sucess in the set [0.02,0.03 ..... 0.35]Then obtain a plot of a power cure.
+
+```{r}
+pvalues <- seq(from = 0.02, to = 0.35, by = 0.01)
+
+power <- pbinom(S,n, prob = pvalues)
+
+plot(pvalues,
+     power,
+     type = "l",
+     xlab = "Probability",
+     ylab = "Power",
+     main = "Power Curve")
+
+```
+
+# 2.8.15
+## For the situation of Exercise 2.8.13, a larger clinical study was run. In this study patients were randomly assigned to either the standard drug or the new drug. Let p1 and p2 denote the cure rates for patients under the new drung and the standard drug, respectively. The Hypotheses of interest are: H0 p1 = p2 versus HA : p1>p2.
+
+```{r}
+#New Drug
+n1 = 200
+n1cured = 135
+
+#Standard Drug
+n2 = 210
+n2cured = 130
+
+p1 = n1/n1cured
+p2 = n2/n2cured
+
+
+```
+
+### a) Determine the p-value of the scores test 2.21. Conclude at the 5% level of significance.
+
+The One sided p-value is 0.1181 > 0.05, so we fail to reject the null hypothesis that p1 = p2
+
+### b) Obtain the 95% level confidence interval for p1 - p2.  
+
+```{r}
+
+prop.test(c(n1cured,n2cured),c(n1,n2), correct = FALSE)
+
+pvalue = 0.2362
+
+pvalue/2 
+
+```
+
+The 95% confidence interval is [ -0.03639217, 0.14829693]. 
+
+
+# 2.8.16
+
+## Simulate the power of the wald and scores type two-sample proportions test for the hypotheses. H0: p1=p2 versus HA: p1 > p2 for the following situation. Assume that population 1 is Bernoulli with p1 = 0.6: population 2 is Bernoulli with p2 = 0.5: the level alpha = 0.05; and n1 = n2 = 50. Recall that the call rbinom(m,n,p) returns m binomial variates with distribution bin(n,p)
+
+```{r}
+p1 = 0.6
+p2 = 0.5
+alpha = 0.05 
+n1=50
+n2=50
+nsims = 1000
+
+set.seed(0)
+pvals <- numeric(nsims)
+
+for (i in 1:nsims){
+  x1 <- rbinom(1,n1,p1)
+  x2 <- rbinom(1,n2,p2)
+  
+  test <- prop.test(x = c(x1, x2),
+                    n = c(n1, n2),
+                    alternative = "greater",
+                    correct = FALSE)
+  pvals[i] <- test$p.value
+}
+
+sum(pvals < 0.05) / nsims
+
+```
+
+The empirical Power from the Simulations is 0.268. This means about 26.8% of times we correctly reject the null-hypothesis. 
+
+
+# 2.8.17
+
+## In a large city, four candidates (Smith, Jones, Martinelli and Wagner) are running for Mayor. A poll was conducted by random dialing with the following results: 
+
+```{r}
+nSmith = 442
+nJones = 208
+nMartinelli = 460
+nWagner = 180
+nOthers = 205
+
+N <- sum(nSmith,nJones,nMartinelli,nWagner,nOthers)
+```
+
+
+## Using a 95 % confidence interval, determine if there is a signficant difference between the two front runners.
+
+
+```{r}
+prop.test(c(nSmith,nMartinelli), c(N,N), correct = FALSE)
+
+```
+
+The 95 % confidence Interval for the two front runners is [-0.04494063, 0.02086036].
+
+
+# 2.8.18
+## In an Example 2.7.1 we tested wheter or not a dataset was drawn from a binomial distribtuion. For this exercise, generate a sample of size n = 500 from a truncated Poisson dsitribtution as illustrated with the following R Code.
+
+```{r}
+set.seed(0)
+x <- rpois(500,3)
+x[x >= 8] = 7
+
+```
+
+
+### Obtain a plot of the histogram of the sample
+
+```{r}
+hist(x, breaks= 0:7, main = "Histogram of Poisson Distribution")
+```
+
+### Obtain an estimate of the sample proportion (phat<- mean(x/7))
+
+```{r}
+n <- length(x)
+range <- 0:7
+
+phat <- mean(x) / 7
+phat
+  
+  
+  
+```
+
+### Test to see if the sample has a binomial distribution with n = 7
+
+
+```{r}
+pmf <- dbinom(range,size = 7,prob = phat) 
+rbind(range,round(pmf,3))
+
+observed <- table(factor(x, levels=0:7)) 
+test.result <- chisq.test(x = observed, p = pmf)
+pchisq(test.result$statistic, df = 6,lower.tail = FALSE)
+probs <-test.result$expected/ length(x)
+results <- round(probs,3)
+
+results
+```
+
+The sample does have a binomial distribution with n = 7 because the observed values are identical with the theoretical values.
+
+# 2.8.19 
+
+## Rasmussen(1992) presents the following data on a survey of workers in a large factory on two variables: Their feelings concerning a smoking ban(Approve, Do not approve, Not sure) and Smoking Status(Never smoked, Ex-Smoker, Current Smoker). Use the Chi-squared test to test the independence of these variables Using a post-test analysis, determine what categories contribute heavily,to the dependence. 
+
+```{r}
+Approve <- c(237,106,24)
+Not_Approve <- c(3,4,32)
+Not_sure <- c(10,7,11)
+
+ct <- cbind(Approve,Not_Approve,Not_sure)
+
+chifit <- chisq.test(ct)
+chifit
+(chifit$residuals)^2
+
+ct2 <- ct[-3,]
+chifit2 <- chisq.test(ct2)
+
+chifit2$p.value < 0.05
+(chifit2$residuals)^2
+
+
+```
+
+This suggest that conditional on the smoking Status not beeing a Current Smoker the Smoking Status and Approval of the smoking ban are independent. The biggest contributer to these values originally beeing dependant is the smoking status current smoker. 
+
+
+# 2.8.20
+
+## The following data are drawn from Agresti(1996). It concerns the approval ratings of a Canadian prime minister in two surveys. In the first survey, ratings were obtained on 1600 citizens and then in a second survey,six months later, the same citizens were resurveyed. The data are tabled below. Use McNemar's test to see if given a change in attitude toward the prime minister, the probability of going from approval to disapproval is higher than the probability of going from disapproval to approval. Also determine a 95% Confidence interval for the difference of the difference of these two probabilities.
+
+```{r}
+Approve <- c(794,86)
+Disapprove <- c(150,570)
+
+cbind(Approve,Disapprove)
+
+teststat <- (150-86)^2/(150+86)
+pvalue <- (1-pchisq(teststat,1))/2
+pexact <- 1 - pbinom(149,(150+86), prob = 0.5)
+
+results1 <- c(teststat, pvalue,pexact)
+
+round(results1, 5)
+
+n1 <- 794 + 150
+n2 <- 86 + 570
+
+prop.test(x = c(86,150), n = c(n1,n2))
+
+
+
+
+```
+Our Null Hypothesis here was that the probability of switching from Approve to Disapprove is the same as switching from Disapprove to Approve, but the high value for the Chi Squared test statistic shows us that we need to reject the null hypothesis indicating that citizens became more likely to disapprove when they initially approved the prime Minister. The 95 % Confidence interval is [-0.17585916, -0.09925452].
+
+
+
+# 2.8.22 Mendel's early work on heredity in peas is well known. Briefly, he conducted experiments and the peas could be either round or wrinkled, yellow or green. So there are four possible combinations: RY,RG,WY,WG. If his theory were correct the peas would be observed in a 9:3:3:1 ratio. Suppos the outcome of the expirment yielded the following observed data. Calculate a p-value and comment on the results.
+
+
+
+```{r}
+observed <- c(315,108,101,32)
+n <- sum(observed)
+expected_probabilities = c(9/16,3/16,3/16,1/16)
+expected_values = expected_probabilities * n
+
+
+chifit <- chisq.test(x = observed, y = expected_values)
+(chifit$residuals)^2
+
+(chifit$p.value) < 0.05
+
+
+
+```
+
+The P-value of Chi-sqaured test statistics is 0.2381033.Since that is smaller than 0.05 we fail to reject the null hypothesis that the given Ratios are different than the actually observed ratios. Therefore we can conclude that Mendels theory that the peas would be observed in 9:3:3:1 ratio is true.  
+
+# 2.8.23
+
+## Suppose there are two ways of making widgets: proccess A and process B. Assume there is a reliable way in which to measure the overall quality of widgets made from either proccess such that higher value can be measured with some accuracy. Suppose that a plant has 25 operators and each operator then makes a widget of each type in random order. The results are such that procces A has more value than Process B for 20 operators, B has more value than A for 3, and the measurments were not different for 2 operators. These data present pretty convincing evidence in favor of Proccess A. How likely is such a result due to chance if the process were actually equally in terms of quality.
+
+The Distribution in this one would be Binomial where the Probability that A is better than B and B is better than A is given through the question. So our Null Hypothesis would be that both processes are equally as good. The alternative Hypothesis is that P A > B is greater than A < B. 
+
+P ( A > B ) = 20/25
+P ( A = B ) = 2/25
+P ( A < B ) = 3/25
+
+```{r}
+
+Abetter = 20
+Bbetter = 3
+n = 23
+
+prop.test(x = Abetter, n = n, p = 0.5, alternative = "greater", correct = FALSE)
+prop.test(x = Abetter, n = n, p = 0.5, alternative = "two.sided", correct = FALSE)
+
+
+```
+We reject the Null-Hypothesis, there is a difference between the P(A > B) and P(A < B). 
+
+
+# 2.8.24 Conduct a Monte carlo Simulation to approximate the power of the test discussed in Example 2.4.3 when true Theta = 1.5 
+
+```{r}
+
+myBootstraptest = function(x, nullTheta = 1, B = 5000) {
+  n = length(x)
+  thetahat = mean(x)
+  x0 = x-thetahat + nullTheta
+  mean(x0)
+  xbs = matrix( sample(x0, n*b, replace = T), ncol = n)
+  pval = mean(xbar >= thetahat)
+  pval
+}
+```
+
+
+```{r}
+B = 1000
+pvals = rep(NA,B)
+nullTheta = 1.5
+
+
+set.seed(0)
+for (i in 1:B) {
+  x = rnorm(25,1.5,1)
+  n = length(x)
+  thetahat <- mean(x)   
+  x0 = x-thetahat + nullTheta
+  mean(x0)
+  xbs = matrix( sample(x0, n*B, replace = T), ncol = n)
+  xbar = apply(xbs, 1.5,mean)
+  pval = mean(xbar >= thetahat)
+  pvals[i] = pval
+}
+
+mean(pvals < 0.05)
+
+```
+
+We reject the null hypothesis 5.5 % of the time correctly. 
+

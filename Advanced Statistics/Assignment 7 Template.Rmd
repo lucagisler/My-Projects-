@@ -1,0 +1,512 @@
+---
+title: Homework 7
+author: LUCA GISLER 
+date: '`r Sys.Date()`' 
+output: 
+  html_document:
+    number_sections: no
+    toc: yes
+    toc_float: yes
+---
+
+
+```{r}
+
+mu = (NA)
+myWilcoxAdvancedTest = function(x,y, alpha = 0.05) {
+  
+  n1 = length(x)
+  n2 = length(y)
+  n = n1+n2
+  
+  z = c(y,x)
+  xbar = n2*(n+1)/2
+  Tscore = sum( rank(z)[1:n2] )
+  Tplus = n1*n2 + n1*(n1+1)/2 - Tscore
+  TW = sqrt(12)/(n+1)*(Tscore - n2*(n+1)/2)
+  
+  mycounts = function( x ) { sum(x == z ) }
+  list = lapply(sort(z), mycounts)
+  ties = as.numeric(list)
+  
+  Ties_adjustment = sum( (ties^3-ties)/ties )
+  SE = sqrt( n1*n2/12*( n+1 - Ties_adjustment/(n*(n-1))))
+  z = (Tplus-mu)/SE
+  
+  zscore = (Tscore - xbar)/SE
+  
+  if ( Tscore > xbar ) {
+    pval = pnorm(zscore, lower.tail = F)*2
+  }
+  else {
+    pval = pnorm(zscore, lower.tail = T)*2
+  }
+
+  CI = c(0,0)
+  names(CI) = c("lower","upper")
+  
+  X = matrix( rep(x,n2), ncol = n1, byrow = T)
+  Y = matrix( rep(y,n1), ncol = n1, byrow = F)
+  D = as.vector( sort(Y - X) )
+  N = length(D)
+  zstar = qnorm(1-alpha/2)
+  c = round( n1*n2/2 - 1/2 - zstar*sqrt( n1*n2*(n+1)/12) )
+  CI = D[c(c+1, N-c)]
+  
+  list( pval = pval, estimate = median(Y-X), SE = SE, Tscore = Tscore, Tplus = Tplus, TW = TW, zscore = zscore, CI = CI )
+}
+```
+
+
+# 3.7.4
+
+## Let T = logS, where S has an F-distribution with degrees of freedom v1 and v2. It can be shown that the distribution of T is left-skewed, right-skewed or symmetric if v1 < v2, v1 > v2, or v1 = v2 respectively. 
+
+(a) Generate two sample size n = 20 from a log F(1,0.25) distribution, to one of the two samples add a shift of size delta = 7. 
+
+(b) Obtain comparison dotplots of the samples.
+
+(c) Obtain the LS,Wilcoxon and bentscores1 estimates of delta along with their standard errors. 
+
+```{r}
+set.seed(0)
+x = log( rf(20, 1, 0.25))
+y = log( rf(20, 1, 0.25)) + 7.0
+```
+
+```{r}
+hist(x)
+hist(y)
+```
+
+```{r}
+boxplot(x,y)
+```
+
+```{r}
+data = data.frame( 
+  Z = c(x,y),
+  c = as.factor( c(rep("x",length(x)), rep("y",length(y))) )
+)
+
+library(ggplot2)
+# Basic dot plot
+p<-ggplot(data, aes(x=c, y=Z)) + 
+  geom_dotplot(binaxis='y', stackdir='center')
+p
+```
+
+
+(c)
+
+```{r}
+# Use this for reporting results.
+resultslm <- c(NA, NA, NA)   
+resultsWcox <- c(NA, NA, NA)
+bent_results <- c(NA, NA, NA)
+LS = rep(0,3)
+Wilcoxon = LS
+Bentscores = LS
+results = rbind(resultslm, resultsWcox, bent_results)
+colnames(results) = c("Estimates of Delta","SE", "p-value")
+rownames(results) = c("LS","Wilcoxon","BentScores")
+
+
+
+
+
+```
+
+## Least Squares Results
+
+```{r}
+# least squares
+fit = lm( Z ~ c, data = data)
+summary(fit)
+coef_lsqrt = summary(fit)$coefficients
+```
+```{r}
+resultslm <- c(coef_lsqrt[2,1],
+              coef_lsqrt[2,2],
+              coef_lsqrt[2,4])
+```
+
+## Wilcoxon Test
+
+```{r}
+
+wcox = myWilcoxAdvancedTest(x, y)
+wcox
+
+resultsWcox <- c(wcox$estimate,
+                 wcox$SE, 
+                 wcox$pval)
+
+
+
+```
+
+## Bent scores
+
+```{r}
+library(Rfit)
+fit = rfit( Z~c, data = data, scores = bentscores1)
+summary(fit)
+```
+
+```{r}
+# Estimates, SE, and p-value for Bent Scores
+coef_bentscores <- summary(fit)$coef
+
+bent_results <- c(coef_bentscores[2,1], 
+                 coef_bentscores[2,2],
+                 coef_bentscores[2,4])
+
+```
+
+
+## Summary of Results
+
+```{r}
+results
+```
+
+
+# 3.7.5
+
+## Write R code which generates data as in Exercise 3.7.4. Then run a simulation study to estimate the ARE's among the three estimators: LS, Wilcoxon and rank-based estimate using the scores bentscores1: where the empirical ARE between two estimators is their ratio of mean square errors. Use a Simulation size of 10'000. Which estimator is best? Which is worst? 
+
+I've done the LS part of the simulation for you. Fill in the rest.
+
+```{r}
+
+library(Rfit)
+B = 1000
+LS.est = rep(0,B)
+WIL.est = rep(0,B)
+BS.est = rep(0,B)
+
+set.seed(0)
+for( i in 1:B ) {
+
+  x = log( rf(20, 1, 0.25))
+  y = log( rf(20, 1, 0.25)) + 7.0
+  
+  #LS
+  data = data.frame( 
+    Z = c(x,y),
+    c = as.factor( c(rep("x",length(x)), rep("y",length(y))) )
+  )
+  fit = lm( Z ~ c, data = data)
+  LS.est[i] = fit$coefficients[2]
+  
+}
+  
+  # Wilcoxon
+for( i in 1:B ) {
+
+  x = log( rf(20, 1, 0.25))
+  y = log( rf(20, 1, 0.25)) + 7.0
+  
+    data = data.frame( 
+    Z = c(x,y),
+    c = as.factor( c(rep("x",length(x)), rep("y",length(y))) )
+  )
+  
+  wcox <- myWilcoxAdvancedTest(x,y)
+  WIL.est[i] = wcox$estimate
+  
+}
+
+for( i in 1:B ) {
+
+  x = log( rf(20, 1, 0.25))
+  y = log( rf(20, 1, 0.25)) + 7.0
+  
+    data = data.frame( 
+    Z = c(x,y),
+    c = as.factor( c(rep("x",length(x)), rep("y",length(y))) )
+  )
+
+fit = rfit( Z~c, data = data, scores = bentscores1)
+coef_bentscores <- summary(fit)$coef
+
+BS.est[i] = coef_bentscores[2,1]
+
+}
+
+```
+
+## ARE of LS vs. Wilcoxon
+
+```{r}
+# LS vs Wilcoxon
+
+
+mLS <- var(LS.est)
+mWIL <- var(WIL.est)
+mBS <- var(BS.est)
+
+ARE_LSvWCOX <- mLS / mWIL 
+
+# LS vs Bent scores
+ARE_LSvBS <- mLS / mBS
+
+# Wilcoxon vs Bent scores
+ARE_WILvBS <- mWIL / mBS
+
+ARE_LSvWCOX 
+ARE_LSvBS
+ARE_WILvBS
+```
+
+The Least squares estimator has 2.435076 times smaller Mean Squared Errors than the Bentscores estimator. Therefore I would argue that the Least Square estimator is the most accurate. The Least-Squared Regression Estimator vs Wilcoxon  1.565822 times more accurate than the Wilcoxon Estimators. So therefore the Least square estimator is the most accurate then the Wilcoxon and the least accurate is the Bentscores estimator. 
+
+
+
+# 3.7.6
+
+## Using the function hogg.test run Hogg's adaptive scheme of Section 3.6 on the data of exercise 3.7.4 
+
+
+```{r}
+library(npsm)
+set.seed(0)
+x = log( rf(20, 1, 0.25))
+y = log( rf(20, 1, 0.25)) + 7.0
+
+hogg.test(x, y)
+
+```
+
+Scores Selected:  bent 
+
+# 3.7.7
+
+## The truncated normal distribution is implemented in the R package truncnorm. Simulate two independent samples from a truncated normal distribution with parameters std = 1, alpha = -0.5, b = 0.5 : the last two parameters are the min and max respectively. Set the mean for one of the populations to be 5 and the other to be 8. 
+
+(a) Obtain comparison boxplots of these two samples.
+
+```{r}
+library(ggplot2)
+library(truncnorm)
+set.seed(0)
+x = rtruncnorm(100, a = -0.5, b = 0.5, mean = 5, sd = 1)
+y = rtruncnorm(100, mean = 8, sd = 1)
+hist(x)
+hist(y)
+
+
+data = data.frame( 
+  Z = c(x,y),
+  c = as.factor( c(rep("x",length(x)), rep("y",length(y))) )
+)
+
+boxplot(Z~c, data=data)
+
+
+```
+(b) Using the R function hogg.test provided in the package npsm run the adaptive scheme discussed in Section 3.6 to test for a loction difference using these two samples. 
+
+```{r}
+library(npsm)
+hogg.test(x,y)
+
+```
+
+H0: there is no location difference 
+HA: there is a location difference
+
+The hogg test presents empirical evidence that we reject the Null-hypothesis, therefore the alternative Hypothesis is true. There is a location difference. 
+
+# 3.7.8-9
+
+We will do these in class.
+
+Here is some code that illustrates this
+```{r}
+
+set.seed(0)
+x = rlogis(1000)
+plot(density(x), ylim = c(0,0.3))
+curve( exp(-x)*(1+exp(-x))^(-2), add=T, col = "blue")
+```
+
+
+
+
+# 3.7.10
+
+## Write an R function which obtains two independent samples from logistic distribution, and then run's Hogg's adaptive scheme of section 3.6 on these data. Have the input of the function be the sample sizes: n and m
+
+(a) Write R code to simulate Hogg's adaptive scheme for testing for a shift in location when sampling from a logistic. Use sample sizes of n = 20 and m =25
+
+```{r}
+# Example sampling
+n = 20
+m = 25
+
+x = rlogis(n)
+y = rlogis(m)
+
+hogg.test(x,y)
+```
+
+(b) Run your simulations in part (a) 1000times. Check the p-value for a 5 percent test. How many times did the scheme select the Wilcoxon scores? Obtain a 95 % confidence interval for the probability of correct selections. 
+
+```{r}
+set.seed(0)
+library(npsm)
+B = 1000
+m = 20
+n = 25
+
+score_selected = character(0)
+p_value = numeric(0)
+
+for(i in 1:B){ 
+  x = rlogis(n)
+  y = rlogis(m)
+  results = hogg.test(x,y)
+  score_selected[i] = results$scores
+  p_value[i] = results$p.value
+}
+
+WIL_count = sum(score_selected =="Wilcoxon")
+WIL_count
+
+
+sum(p_value == 0.05)
+
+accuracy = WIL_count / B
+
+accuracy
+
+
+p = 0.977
+SE = sqrt(p*(1-p)/B)
+p + c(-1,1) * 1.96*SE
+
+
+
+```
+
+The 95 % confidence Interval is [0.9677089 0.9862911]. 
+
+
+# 3.7.11
+
+There is an error in the description of the second distribution. Use N(50,256).
+
+To save time on data entry, instead data in the box, use this data:
+
+```{r}
+set.seed(0)
+x = rnorm(15, 50, 64)
+y = rnorm(18, 50, 256)
+
+data = data.frame(
+  Z = c(x, y),
+  c = factor(c(rep("x", length(x)), rep("y", length(y))))
+)
+
+boxplot(Z ~ c, data = data)
+
+
+```
+
+(b) Obtain the Analysis based on the Fligner-Killeen procedure to test for a difference in scales for this data. Was the confidence Interval sucessfull in trapping the true ratio of scales given by n = 2.0 
+
+```{r}
+fk.test(x,y)
+
+
+```
+
+The Fligner-Kileen test predicts that there is a significant difference between x and y. (p-value < 0.05). Furthermore the Fligner-Killeen test correctly traps n = 2 in the 95 percent confidence interval [1.225619, 4.259693]. 
+
+# 3.7.12
+
+Use the code from #9 to compare density functions for the sampled data and the theoretical pdf.
+
+```{r}
+set.seed(0)
+rlaplace = function(n) {
+  x = rexp(n)
+  ind = sample(c(-1,1),n,replace = T)
+  ind*x
+}
+
+x_laplace = rlaplace(1000)
+
+
+
+plot(density(x_laplace), ylim = c(0,0.5), main = "Empirical vs Theoretical")
+curve( 0.5 * exp(-abs(x)), add=T, col = "red")
+```
+
+(b) By running a small simulation study,verify that the Fligner-Killeen procedure is valid for testing for scale differences when sampling from the double exponential distribution. Use sample sizes n1 = 30 and n2 = 35 and sample under H0: i.e draw the samples using the R function laplace. Collect the p-values for a two-sided test for 1000 simulations and verify that the test with level 0.05 is valid. 
+
+
+```{r}
+
+set.seed(0)
+n1 = 30
+n2 = 35
+
+nsim = 1000
+alpha = 0.05
+
+pvalues = numeric()
+
+for(i in 1:nsim) {
+  x1 = rlaplace(n1)
+  x2 = rlaplace(n2)
+  results = fk.test(x1,x2)
+  pvalues[i] = results$p.value
+  
+}
+
+accuracy = mean(pvalues <= 0.05)
+accuracy
+
+
+
+```
+
+The results of the variable accuracy show that approximately 55 times out of 1000 times the Null Hypothesis is incorrectly rejected. Given that we choose our alpha level to be 0.05, we can conclude that the Filgner-Killeen test works for the exponential distribution as well because the confidence level is true. 
+
+
+
+
+# 3.7.13
+
+## Consider the data of Exercise 3.7.11. The samples were generated from the N(50,64) and N(50,256) distributions respectively. Use the Fligner policello test described in Section 3.4 to test for a difference in locations. Recall by example 3.4.1 that the npsm function fp.test can be used to perform this analysis. 
+
+Again, there is an error in the description of the second distribution. Use N(50,256).
+
+```{r}
+library(npsm)
+set.seed(0)
+x = rnorm(15, 50, 64)
+y = rnorm(18, 50, 256)
+
+fp.test(x,y, alternative = "greater")
+fp.test(x,y, alternative = "less")
+
+
+data = data.frame(
+  Z = c(x, y),
+  c = factor(c(rep("x", length(x)), rep("y", length(y))))
+)
+
+boxplot(Z ~ c, data = data)
+```
+
+
+(using the two-sided fp.test it kept giving me error messages that p-val is not available so I just tested in two directions...)
+
+According to the Fligner-Policello test there is statistically evidence that the Location is the same. Therefore we fail to reject the null-hypothesis.This makes sense when looking at the boxplot graph as the locations are almost the same. 
+
+
+

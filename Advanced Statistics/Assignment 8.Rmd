@@ -1,0 +1,22 @@
+---
+title: "Assignment 8"
+author: "Luca Gisler"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+# 4.9.1
+
+Obtain a scatterplot of the telephone data. Overlay the least sqaures and R fit. 
+
+# 4.9.2
+
+Write an R function which gives the results of a call to rfit returns the diagnostic plots: Studentized residuals versus fitted values, with +- 2 horizontal lines for outlier identification: normal q-q plot of the Studentized residuals, with +- 2 horizontal lines outliers for outlier identification: histogram of residuals and a boxplot of the residuals. 
+
+
+# 4.9.3 
+
+(a) For the Wilcoxon fit, obtain the Studentized residual plot and q-q plot of the Studentized residual. Comment on the skewness of the errors. 
+(b) Redo the analysis of the free acid data using the bent scores (bentscores1). Compare the summary of the regression coefficients which those from the Wilcoxon fit. Why is the bent score fit more precise (smaller standard errors) than the Wilcoxon fit. 
+
